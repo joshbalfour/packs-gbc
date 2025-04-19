@@ -77,8 +77,8 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
                         UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
                     } else {
                         UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + 0, NULL);
-                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + 0, NULL);
-                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + 0, NULL);
+                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + (shape == SHAPE_RECT ? 0 : 1), NULL);
+                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset +  (shape == SHAPE_RECT ? 0 : 2), NULL);
                     }
                 }
                 if (cy == 1) {
@@ -138,10 +138,9 @@ void START(void) {
     PopulateCard(1, 1, 2, COLOUR_RED, SHAPE_RECT, FILL_STRIPED);
     PopulateCard(2, 1, 2, COLOUR_RED, SHAPE_RECT, FILL_FILLED);
 
-    
-    PopulateCard(0, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_EMPTY);
-    PopulateCard(1, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_STRIPED);
-    PopulateCard(2, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_FILLED);
+    PopulateCard(0, 2, 3, COLOUR_RED, SHAPE_SQUISH, FILL_EMPTY);
+    PopulateCard(1, 2, 3, COLOUR_RED, SHAPE_SQUISH, FILL_STRIPED);
+    PopulateCard(2, 2, 3, COLOUR_RED, SHAPE_SQUISH, FILL_FILLED);
     
     // PopulateCard(1, 0, 3, COLOUR_RED, SHAPE_RECT, FILL_EMPTY);
     // PopulateCard(1, 1, 1, COLOUR_ORANGE, SHAPE_RECT, FILL_STRIPED);
