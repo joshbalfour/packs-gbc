@@ -3,7 +3,7 @@ PROJECT_NAME = ZGB_TEMPLATE
 # Set platforms to build here, spaced separated. (These are in the separate Makefile.targets)
 # They can also be built/cleaned individually: "make gg" and "make gg-clean"
 # Possible are: gb gbc pocket megaduck sms gg
-TARGETS=gb gbc
+TARGETS=gbc
 
 # Builds all targets sequentially
 all: $(TARGETS)
@@ -12,6 +12,6 @@ all: $(TARGETS)
 N_BANKS = A
 
 # Default hardware sprites size: SPRITES_8x16(default) or SPRITES_8x8
-DEFAULT_SPRITES_SIZE = SPRITES_8x16
+DEFAULT_SPRITES_SIZE = SPRITES_8x8
 
 include $(subst ',,$(subst \,/,'$(ZGB_PATH)'))/src/MakefileCommon
