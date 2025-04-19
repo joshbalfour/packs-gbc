@@ -56,6 +56,7 @@ red
 #define COLOUR_BLUE 2
 
 #define SHAPE_RECT 0
+#define SHAPE_SQUISH 21
 #define BLANK_CARD_BG_TILE 10
 
 
@@ -63,7 +64,7 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
 
-    uint8_t tileOffset = SHAPE_TILE_OFFSET + colour - 1;
+    uint8_t tileOffset = SHAPE_TILE_OFFSET + shape + colour - 1;
     uint8_t fillOffset = fill * 9;
 
     for (uint8_t cy = 0; cy<4; cy++) {
