@@ -38,7 +38,7 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
         UpdateMapTile(TARGET_BKG, x, y + i, BANK(map), tileNum, NULL);
         UpdateMapTile(TARGET_BKG, x + 1, y + i, BANK(map), tileNum + anotherOne, NULL);
     }
-}!
+}
 
 
 void START(void) {
