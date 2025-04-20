@@ -21,6 +21,7 @@
         "setautobank.h": "c",
         "zgbmain_init.h": "c",
         "main.h": "c",
-        "flip.h": "c"
+        "flip.h": "c",
+        "sprite.h": "c"
     }
 }

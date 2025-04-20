@@ -3,6 +3,8 @@
 #include "ZGBMain.h"
 #include "Scroll.h"
 #include "SpriteManager.h"
+#include "Sprite.h"
+#include "Keys.h"
 
 IMPORT_MAP(map);
 
@@ -60,8 +62,43 @@ red
 #define SHAPE_DIAMOND 48
 #define BLANK_CARD_BG_TILE 10
 
+#define CARD_FRAME_DEFAULT 0
+#define CARD_FRAME_SELECTED 1
+#define CARD_FRAME_SUCCESS 2
+#define CARD_FRAME_ERROR 3
+
+void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) {
+    unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x03 : 0x01);
+    uint8_t palette = (UINT8)(BANK(map) >> 8) + pal;
+
+    uint8_t x = HORIZ_SPACING * gridX;
+    uint8_t y = VERT_SPACING * gridY;
+
+    UpdateMapTile(TARGET_BKG, x, y, BANK(map), 4 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 1, y, BANK(map), 7 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 2, y, BANK(map), 7 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 3, y, BANK(map), 7 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y, BANK(map), 1 - 1, &palette);
+
+    UpdateMapTile(TARGET_BKG, x, y + 1, BANK(map), 5 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 1, BANK(map), 2 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 2, BANK(map), 5 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 2, BANK(map), 2 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 3, BANK(map), 5 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 3, BANK(map), 2 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 4, BANK(map), 5 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 4, BANK(map), 2 - 1, &palette);
+
+    
+    UpdateMapTile(TARGET_BKG, x, y + 5, BANK(map), 6 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 1, y + 5, BANK(map), 8 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 2, y + 5, BANK(map), 8 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 3, y + 5, BANK(map), 8 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 5, BANK(map), 3 - 1, &palette);
+}
 
 void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) {
+    DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
 
@@ -115,7 +152,7 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
                 }
             }
         }
-        
+
         if (num == 2) {
             uint8_t top = cy % 2;
             uint8_t rowOffset = (fill == FILL_FILLED && shape == SHAPE_RECT) ? (top ? 1 : 2) : (top ? 3 : 6);
@@ -127,10 +164,19 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
     }
 }
 
+Sprite* selectorSpr;
+
+uint8_t gridX = 0;
+uint8_t gridY = 0;
+
+#define INITIAL_X 20
+#define INITIAL_Y 24
 
 void START(void) {
 	// scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
 	InitScroll(BANK(map), &map, 0, 0);
+
+    selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
     PopulateCard(0, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_EMPTY);
     PopulateCard(1, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_FILLED);
@@ -149,4 +195,46 @@ void START(void) {
 }
 
 void UPDATE(void) {
+    if(KEY_TICKED(J_UP)) {
+        if (!gridY) {
+            gridY = 2;
+        } else {
+            gridY--;
+        }
+	}
+
+	if(KEY_TICKED(J_DOWN)) {
+        gridY++;
+        if (gridY > 2) {
+            gridY = 0;
+        }
+	}
+
+    
+    if(KEY_TICKED(J_UP) || KEY_TICKED(J_DOWN)) {
+        selectorSpr->y = INITIAL_Y + (gridY * 48);
+    }
+
+	if(KEY_TICKED(J_LEFT)) {
+        if (!gridX) {
+            gridX = 3;
+        } else {
+            gridX--;
+        }
+	}
+
+	if(KEY_TICKED(J_RIGHT)) {
+        gridX++;
+        if (gridX > 3) {
+            gridX = 0;
+        }
+	}
+
+    if(KEY_TICKED(J_LEFT) || KEY_TICKED(J_RIGHT)) {
+        selectorSpr->x = INITIAL_X + (gridX * 40);
+    }
+
+    if (KEY_TICKED(J_A)) {
+        DrawCardFrame(gridX, gridY, CARD_FRAME_SELECTED);
+    }
 }
