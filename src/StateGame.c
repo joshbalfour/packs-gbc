@@ -69,7 +69,7 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
 
     for (uint8_t cy = 0; cy<4; cy++) {
         if (num == 3 || num == 1) {
-            if (fill == FILL_FILLED) {
+            if (fill == FILL_FILLED && shape == SHAPE_RECT) {
                 if (cy == 0 || cy == 3) { // top or bottom rows
                     if (num == 1) {
                         UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
@@ -91,9 +91,7 @@ void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, ui
                     UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + 1, NULL);
                     UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + 1, NULL);
                 }
-            }
-    
-            if (fill == FILL_EMPTY || fill == FILL_STRIPED) {
+            } else {
                 if (cy == 0 || cy == 3) { // top or bottom rows
                     if (num == 1) {
                         UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
