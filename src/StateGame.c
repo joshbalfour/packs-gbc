@@ -67,7 +67,7 @@ red
 #define CARD_FRAME_SUCCESS 2
 #define CARD_FRAME_ERROR 3
 
-void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) {
+void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
     unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x03 : 0x01);
     uint8_t palette = (UINT8)(BANK(map) >> 8) + pal;
 
@@ -97,7 +97,7 @@ void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) {
     UpdateMapTile(TARGET_BKG, x + 4, y + 5, BANK(map), 3 - 1, &palette);
 }
 
-void PopulateCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) {
+void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) {
     DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
@@ -178,20 +178,26 @@ void START(void) {
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
-    PopulateCard(0, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_EMPTY);
-    PopulateCard(1, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_FILLED);
-    PopulateCard(2, 0, 3, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_FILLED);
-    PopulateCard(3, 0, 3, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
+    DrawCard(0, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_EMPTY);
+    DrawCard(1, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_FILLED);
+    DrawCard(2, 0, 3, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_FILLED);
+    DrawCard(3, 0, 3, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
 
-    PopulateCard(0, 1, 2, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
-    PopulateCard(1, 1, 2, COLOUR_RED, SHAPE_RECT, FILL_STRIPED);
-    PopulateCard(2, 1, 2, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_STRIPED);
-    PopulateCard(3, 1, 2, COLOUR_BLUE, SHAPE_SQUISH, FILL_STRIPED);
+    DrawCard(0, 1, 2, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
+    DrawCard(1, 1, 2, COLOUR_RED, SHAPE_RECT, FILL_STRIPED);
+    DrawCard(2, 1, 2, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_STRIPED);
+    DrawCard(3, 1, 2, COLOUR_BLUE, SHAPE_SQUISH, FILL_STRIPED);
 
-    PopulateCard(0, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_EMPTY);
-    PopulateCard(1, 2, 1, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
-    PopulateCard(2, 2, 1, COLOUR_ORANGE, SHAPE_SQUISH, FILL_FILLED);
-    PopulateCard(3, 2, 1, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
+    DrawCard(0, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_EMPTY);
+    DrawCard(1, 2, 1, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
+    DrawCard(2, 2, 1, COLOUR_ORANGE, SHAPE_SQUISH, FILL_FILLED);
+    DrawCard(3, 2, 1, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
+}
+
+
+void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
+    DrawCardFrame(gridX, gridY, CARD_FRAME_SELECTED);
+
 }
 
 void UPDATE(void) {
@@ -235,6 +241,6 @@ void UPDATE(void) {
     }
 
     if (KEY_TICKED(J_A)) {
-        DrawCardFrame(gridX, gridY, CARD_FRAME_SELECTED);
+        SelectCard(gridX, gridY);
     }
 }

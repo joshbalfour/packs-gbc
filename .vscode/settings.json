@@ -22,6 +22,7 @@
         "zgbmain_init.h": "c",
         "main.h": "c",
         "flip.h": "c",
-        "sprite.h": "c"
+        "sprite.h": "c",
+        "packs.h": "c"
     }
 }
