@@ -8,7 +8,7 @@
 
 #include "packs.h"
 
-IMPORT_MAP(map);
+IMPORT_TILES(cardtiles);
 
 #define VERT_SPACING 6
 #define HORIZ_SPACING 5
@@ -62,40 +62,44 @@ red
 #define SHAPE_RECT 0
 #define SHAPE_SQUISH 21
 #define SHAPE_DIAMOND 48
-#define BLANK_CARD_BG_TILE 10
+#define BLANK_CARD_BG_TILE 11
 
 #define CARD_FRAME_DEFAULT 0
 #define CARD_FRAME_SELECTED 1
 #define CARD_FRAME_SUCCESS 2
 #define CARD_FRAME_ERROR 3
 
+uint16_t map_offset = 0;
+
+#define CARD_FRAME_OFFSET 0
+
 void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
     unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x03 : 0x01);
-    uint8_t palette = (UINT8)(BANK(map) >> 8) + pal;
+    uint8_t palette = (UINT8)(BANK(cardtiles) >> 8) + pal;
 
     uint8_t x = HORIZ_SPACING * gridX;
     uint8_t y = VERT_SPACING * gridY;
 
-    UpdateMapTile(TARGET_BKG, x, y, BANK(map), 4 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 1, y, BANK(map), 7 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 2, y, BANK(map), 7 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 3, y, BANK(map), 7 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y, BANK(map), 1 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y, map_offset, 4 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 1, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 2, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 3, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y, map_offset, 1 + CARD_FRAME_OFFSET, &palette);
 
-    UpdateMapTile(TARGET_BKG, x, y + 1, BANK(map), 5 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y + 1, BANK(map), 2 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x, y + 2, BANK(map), 5 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y + 2, BANK(map), 2 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x, y + 3, BANK(map), 5 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y + 3, BANK(map), 2 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x, y + 4, BANK(map), 5 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y + 4, BANK(map), 2 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 1, map_offset, 5 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 1, map_offset, 2 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 2, map_offset, 5 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 2, map_offset, 2 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 3, map_offset, 5 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 3, map_offset, 2 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 4, map_offset, 5 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 4, map_offset, 2 + CARD_FRAME_OFFSET, &palette);
 
-    UpdateMapTile(TARGET_BKG, x, y + 5, BANK(map), 6 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 1, y + 5, BANK(map), 8 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 2, y + 5, BANK(map), 8 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 3, y + 5, BANK(map), 8 - 1, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y + 5, BANK(map), 3 - 1, &palette);
+    UpdateMapTile(TARGET_BKG, x, y + 5, map_offset, 6 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 1, y + 5, map_offset, 8 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 2, y + 5, map_offset, 8 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 3, y + 5, map_offset, 8 + CARD_FRAME_OFFSET, &palette);
+    UpdateMapTile(TARGET_BKG, x + 4, y + 5, map_offset, 3 + CARD_FRAME_OFFSET, &palette);
 }
 
 void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) BANKED {
@@ -103,53 +107,53 @@ void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
 
-    uint8_t tileOffset = SHAPE_TILE_OFFSET + shape - 1;
+    uint8_t tileOffset = SHAPE_TILE_OFFSET + shape;
     uint8_t fillOffset = fill * 9;
 
     unsigned char pal = colour == COLOUR_RED ? 0x01 : (colour == COLOUR_BLUE ? 0x02 : 0x03);
-    uint8_t palette = (UINT8)(BANK(map) >> 8) + pal;
+    uint8_t palette = (UINT8)(BANK(cardtiles) >> 8) + pal;
 
     for (uint8_t cy = 0; cy<4; cy++) {
         if (num == 3 || num == 1) {
             if (fill == FILL_FILLED && shape == SHAPE_RECT) {
                 if (cy == 0 || cy == 3) { // top or bottom rows
                     if (num == 1) {
-                        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
                     } else {
-                        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + 0, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset, &palette);
+                        UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + 0, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset, &palette);
                     }
                 }
                 if (cy == 1) {
-                    UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + 2, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + 2, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + 2, &palette);
+                    UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + 2, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset + 2, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset + 2, &palette);
                 }
                 if (cy == 2) {
-                    UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + 1, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + 1, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + 1, &palette);
+                    UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + 1, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset + 1, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset + 1, &palette);
                 }
             } else {
                 if (cy == 0 || cy == 3) { // top or bottom rows
                     if (num == 1) {
-                        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, BLANK_CARD_BG_TILE, &palette);
                     } else {
-                        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + 0, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + 1, &palette);
-                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + 2, &palette);
+                        UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + 0, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset + 1, &palette);
+                        UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset + 2, &palette);
                     }
                 } else {
                     uint8_t rowOffset = 6 / cy;
                     // l, m, r
-                    UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + 0, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + 1, &palette);
-                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + 2, &palette);
+                    UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + rowOffset + 0, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset + rowOffset + 1, &palette);
+                    UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset + rowOffset + 2, &palette);
                 }
             }
         }
@@ -158,9 +162,9 @@ void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_
             uint8_t top = cy % 2;
             uint8_t rowOffset = (fill == FILL_FILLED && shape == SHAPE_RECT) ? (top ? 1 : 2) : (top ? 3 : 6);
             // l, m, r
-            UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + 0, &palette);
-            UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + ((fill == FILL_FILLED && shape == SHAPE_RECT) ? 0 : 1), &palette);
-            UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), tileOffset + fillOffset + rowOffset + ((fill == FILL_FILLED && shape == SHAPE_RECT) ? 0 : 2), &palette);
+            UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, tileOffset + fillOffset + rowOffset + 0, &palette);
+            UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, tileOffset + fillOffset + rowOffset + ((fill == FILL_FILLED && shape == SHAPE_RECT) ? 0 : 1), &palette);
+            UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, tileOffset + fillOffset + rowOffset + ((fill == FILL_FILLED && shape == SHAPE_RECT) ? 0 : 2), &palette);
         }
     }
 }
@@ -171,9 +175,9 @@ void DrawEmptyCard(uint8_t gridX, uint8_t gridY) BANKED {
     uint8_t y = Y_START + (VERT_SPACING * gridY);
 
     for (uint8_t cy = 0; cy<4; cy++) {
-        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
-        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
-        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
+        UpdateMapTile(TARGET_BKG, x, y + cy, map_offset, BLANK_CARD_BG_TILE, NULL);
+        UpdateMapTile(TARGET_BKG, x + 1, y + cy, map_offset, BLANK_CARD_BG_TILE, NULL);
+        UpdateMapTile(TARGET_BKG, x + 2, y + cy, map_offset, BLANK_CARD_BG_TILE, NULL);
     }
 }
 
@@ -207,8 +211,7 @@ void DrawGrid(void) BANKED {
 
 uint8_t singleColourGame = 0;
 void START(void) {
-	// scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
-	InitScroll(BANK(map), &map, 0, 0);
+	map_offset = ScrollSetTiles(0, BANK(cardtiles), &cardtiles);
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
