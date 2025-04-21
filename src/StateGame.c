@@ -91,7 +91,6 @@ void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
     UpdateMapTile(TARGET_BKG, x, y + 4, BANK(map), 5 - 1, &palette);
     UpdateMapTile(TARGET_BKG, x + 4, y + 4, BANK(map), 2 - 1, &palette);
 
-    
     UpdateMapTile(TARGET_BKG, x, y + 5, BANK(map), 6 - 1, &palette);
     UpdateMapTile(TARGET_BKG, x + 1, y + 5, BANK(map), 8 - 1, &palette);
     UpdateMapTile(TARGET_BKG, x + 2, y + 5, BANK(map), 8 - 1, &palette);
@@ -99,7 +98,7 @@ void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
     UpdateMapTile(TARGET_BKG, x + 4, y + 5, BANK(map), 3 - 1, &palette);
 }
 
-void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) {
+void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_t shape, uint8_t fill) BANKED {
     DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
@@ -166,7 +165,7 @@ void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_
     }
 }
 
-void DrawEmptyCard(uint8_t gridX, uint8_t gridY) {
+void DrawEmptyCard(uint8_t gridX, uint8_t gridY) BANKED {
     DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
     uint8_t x = X_START + (HORIZ_SPACING * gridX);
     uint8_t y = Y_START + (VERT_SPACING * gridY);
