@@ -23,6 +23,7 @@
         "main.h": "c",
         "flip.h": "c",
         "sprite.h": "c",
-        "packs.h": "c"
+        "packs.h": "c",
+        "gb.h": "c"
     }
 }

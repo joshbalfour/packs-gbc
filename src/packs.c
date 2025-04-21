@@ -1,219 +1,85 @@
 #include "packs.h"
 #include <rand.h>
 #include <gb/gb.h>
+#include <string.h>
 
-static const pack_card deck[81] = {
-    {.num = ONE_SHAPE, .colour = RED, .shape = SQUISH, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = SQUISH, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = SQUISH, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = DIAMOND, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = FILLED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = FILLED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = FILLED},
-    {.num = ONE_SHAPE, .colour = RED, .shape = SQUISH, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = RED, .shape = SQUISH, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = RED, .shape = SQUISH, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = RED, .shape = DIAMOND, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = EMPTY},
-    {.num = ONE_SHAPE, .colour = RED, .shape = SQUISH, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = SQUISH, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = SQUISH, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = SQUISH, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = SQUISH, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = RECTANGLE, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = RED, .shape = DIAMOND, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = RED, .shape = DIAMOND, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = ORANGE, .shape = DIAMOND, .fill = STRIPED},
-    {.num = ONE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = STRIPED},
-    {.num = TWO_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = STRIPED},
-    {.num = THREE_SHAPE, .colour = BLUE, .shape = DIAMOND, .fill = STRIPED},
-};
+uint8_t table[12] = {};
 
-pack_card* table[12] = {};
-pack_card* hand[81] = {};
+void bitsToCard(uint8_t bits, pack_card* outCard) {
+    struct pack_card card = {
+        .bits = bits,
+        .colour = (bits & 0b000011) >> (2*0),
+        .shape =( bits & 0b001100) >> (2*1),
+        .fill = (bits & 0b110000) >> (2*2),
+        .num =( bits & 0b11000000) >> (2*3),
+    };
 
-pack_card* PickNewCard() {
-    uint8_t r = rand() % 81;
-    while (HandContains(&deck[r])) {
-        r = rand() % 81;
-    }
-    return &deck[r];
+    *outCard = card;
 }
 
-uint8_t IsValidPack(pack_card* card0, pack_card* card1, pack_card* card2) {
-    return CalculateThirdBits(card0->bits, card1->bits) == card2->bits;
+// https://sanderevers.github.io/2019/09/11/finding-sets.html#file-findingsets-py-L91
+// [1,2,1,0].reverse().map((a,i) => a<<(2*i)).reduce((a,b) => a+b) 
+uint8_t cardAttrsToBits(enum Colour colour, enum Shape shape, enum Fill fill, enum COUNT num) {
+    uint8_t bits = 0;
+
+    bits += colour << (2*0);
+    bits += shape << (2*1);
+    bits += fill << (2*2);
+    bits += num << (2*3);
+
+    return bits;
 }
 
-// from https://sanderevers.github.io/2019/09/11/finding-sets.html
+// https://sanderevers.github.io/2019/09/11/finding-sets.html#file-findingsets-py-L91
 
-uint8_t mask0 = 85;
-uint8_t mask1 = 170;
+static const uint8_t mask0 = 0b01010101;
+static const uint8_t mask1 = 0b10101010;
 
-uint8_t CalculateThirdBits(uint8_t card0bits, uint8_t card1bits) {
-    uint8_t xor = card0bits^card1bits;
+uint8_t CalculateThirdCardBits(uint8_t card0Bits, uint8_t card1Bits) {
+    uint8_t xor = card0Bits ^ card1Bits;
     uint8_t swap = ((xor & mask1) >> 1) | ((xor & mask0) << 1);
-    return (card0bits & card1bits) | (~(card0bits | card1bits) & swap);
+    return (card0Bits&card1Bits) | (~(card0Bits|card1Bits) & swap);
 }
 
-pack_card* CalculateThird(pack_card* card0, pack_card* card1) {
-    
+uint8_t IsValidPack(uint8_t card0Bits, uint8_t card1Bits, uint8_t card2Bits) {
+    return card2Bits == CalculateThirdCardBits(card0Bits, card1Bits);
 }
 
-uint8_t HandContains(pack_card* card) {
-    for (uint8_t i = 0; i<81; i++) {
-        if (hand[i] && hand[i]->bits == card->bits) {
-            return 1;
-        }
-    }
-    return 0;
-}
+uint8_t deck[81] = {};
+uint8_t consumed[171] = {};
 
-uint8_t TableContainsPack(pack_card* tbl[12]) {
+uint8_t numInDeck = 0;
+uint8_t numConsumed = 0;
 
-}
-
-void PopulateTable() {
-    // if remaining table contains pack, pick 3 random cards using PickNewCard(), add to table, done
-    if (TableContainsPack(table)) {
-        for (uint8_t i = 0; i<11; i++) {
-            if (!table[i]) {
-                table[i] = PickNewCard();
+void PopulateHand(uint8_t singleColor) {
+    for (uint8_t num = 0; num<3; num++) {
+        for (uint8_t shape = 0; shape<3; shape++) {
+            for (uint8_t fill = 0; fill<3; fill++) {
+                if (singleColor) {
+                    deck[numInDeck] = cardAttrsToBits(0, shape, fill, num);
+                    numInDeck++;
+                } else {
+                    for (uint8_t colour = 0; colour<3; colour++) {
+                        deck[numInDeck] = cardAttrsToBits(colour, shape, fill, num);
+                        numInDeck++;
+                    }
+                }
             }
         }
-        return;
-    }
-
-    pack_card* newTable[12] = {};
-    uint8_t ctr = 0;
-    for (uint8_t i = 0; i<11 && ctr < 2; i++) {
-        // pick 2 random cards using PickNewCard()
-        // add to prospective table
-        if (!newTable[i]) {
-            ctr++;
-            newTable[i] = PickNewCard();
-        }
-    }
-
-    if (TableContainsPack(newTable)) {
-        for (uint8_t i = 0; i<11; i++) {
-            if (!newTable[i]) {
-                newTable[i] = PickNewCard();
-                break;
-            }
-        }
-    } else {
-        pack_card* card2 = NULL;
-        pack_card* card0;
-        pack_card* card1;
-
-        // repeat until third is not in hand already
-        while (!card2 || HandContains(&card2)) {
-            // pick 2 random cards from table
-            uint8_t r = rand() % 12;
-            card0 = newTable[r];
-            uint8_t r2 = rand() % 12;
-            card1 = newTable[r2];
-            // calculate third
-            card2 = CalculateThird(&card0, &card1);
-        }
-
-        uint8_t gaps[3] = {};
-
-        // place on newTable in random order
-        uint8_t j = 0;
-        for (uint8_t i = 0; i<11; i++) {
-            if (!table[i]) {
-                gaps[j] = i;
-                j++;
-            }
-        }
-
-        uint8_t r = rand() % 3; // between 0 and 2
-        if (r == 0) {
-            table[gaps[0]] = &card0;
-            table[gaps[1]] = &card1;
-            table[gaps[2]] = &card2;
-        } else if (r == 1) {
-            table[gaps[1]] = &card0;
-            table[gaps[0]] = &card1;
-            table[gaps[2]] = &card2;
-        } else if (r == 2) {
-            table[gaps[2]] = &card0;
-            table[gaps[1]] = &card1;
-            table[gaps[0]] = &card2;
-        }
-        return;
-    }
-
-    // copy newTable over to table
-    for (uint8_t i = 0; i<12; i++) {
-        table[i] = newTable[i];
     }
 }
 
 void ClearAll() {
+    for (uint8_t i = 0; i<81; i++) {
+        deck[i] = NULL;
+    }
+    numInDeck = 0;
+    for (uint8_t i = 0; i<170; i++) {
+        consumed[i] = NULL;
+    }
+    numConsumed = 0;
     for (uint8_t i = 0; i<12; i++) {
         table[i] = NULL;
-    }
-    for (uint8_t i = 0; i<80; i++) {
-        hand[i] = NULL;
     }
 }
 
@@ -225,11 +91,114 @@ void DealGame(uint8_t singleColor) {
     // ---
 
     ClearAll();
+    PopulateHand(singleColor);
 
+    memset(consumed, 0, sizeof consumed);
     // pick 11 cards from deck and add to table
     for (uint8_t i = 0; i<11; i++) {
-        uint8_t r = rand() % 80;
-        table[i] = &deck[r];
+        do {
+            uint8_t r = rand() % numInDeck + 1;
+            if (!consumed[deck[r]]) {
+                table[i] = deck[r];
+                consumed[deck[r]] = 1;
+                numConsumed++;
+            }
+        } while (!table[i]);
     }
+
     // pick 2 random cards from table, calculate third card, add to table in random place
+    uint8_t card1Pos = rand() % 11 + 1;
+    uint8_t card2Pos = rand() % 11 + 1;
+    uint8_t cardDestination = rand() % 12 + 1;
+    uint8_t card3Bits = CalculateThirdCardBits(table[card1Pos], table[card2Pos]);
+    if (consumed[card3Bits]) {
+        card3Bits = PickUnconsumedCard();
+    }
+    consumed[card3Bits] = 1;
+    numConsumed++;
+
+    if (table[cardDestination]) {
+        uint8_t origCard = table[cardDestination];
+        table[11] = origCard;
+        table[cardDestination] = card3Bits;
+    }
+}
+
+uint8_t PickUnconsumedCard() {
+    uint8_t cardIsConsumed = 1;
+    uint8_t cardIdx = 0;
+    while (cardIsConsumed) {
+        cardIdx = rand() % numInDeck + 1;
+        cardIsConsumed = consumed[deck[cardIdx]];
+    }
+    return deck[cardIdx];
+}
+
+uint8_t TableHasPack(uint8_t tableToTest[12]) {
+    // for every 2 card combo
+    for (uint8_t firstCardPos = 0; firstCardPos<12; firstCardPos++) {
+        for (uint8_t secondCardPos = 0; secondCardPos<12; secondCardPos++) {
+            if (firstCardPos != secondCardPos) {
+                // calc third
+                uint8_t card3Bits = CalculateThirdCardBits(tableToTest[firstCardPos], tableToTest[secondCardPos]);
+                for (uint8_t possThirdCardPos = 0; possThirdCardPos<12; possThirdCardPos++) {
+                    if (possThirdCardPos != firstCardPos && possThirdCardPos != secondCardPos) {
+                        // is it on the table?
+                        if (tableToTest[possThirdCardPos] == card3Bits) {
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+// returns if the game is over
+uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2TablePos) {
+    if (numInDeck - numConsumed == 0) {
+        table[card0TablePos] = NULL;
+        table[card1TablePos] = NULL;
+        table[card2TablePos] = NULL;
+        return !TableHasPack(table);
+    }
+
+    uint8_t newCard0 = 0;
+    uint8_t newCard1 = 0;
+    uint8_t newCard2 = 0;
+
+    uint8_t newTable[12] = {};
+
+    do {
+        // pick 3 random cards
+        newCard0 = PickUnconsumedCard();
+        newCard1 = PickUnconsumedCard();
+        newCard2 = PickUnconsumedCard();
+        for (uint8_t i = 0; i<12; i++) {
+            // put on the table
+            if (i == card0TablePos) {
+                newTable[i] = newCard0;
+            } else if (i == card1TablePos) {
+                newTable[i] = newCard1;
+            } else if (i == card2TablePos) {
+                newTable[i] = newCard2;
+            } else {
+                newTable[i] = table[i];
+            }
+        }
+    } while (!TableHasPack(newTable));
+
+    consumed[newCard0] = 1;
+    numConsumed++;
+    consumed[newCard1] = 1;
+    numConsumed++;
+    consumed[newCard2] = 1;
+    numConsumed++;
+
+    for (uint8_t i = 0; i<12; i++) {
+        table[i] = newTable[i];
+    }
+
+    return 0;
 }

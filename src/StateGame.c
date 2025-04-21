@@ -6,6 +6,8 @@
 #include "Sprite.h"
 #include "Keys.h"
 
+#include "packs.h"
+
 IMPORT_MAP(map);
 
 #define VERT_SPACING 6
@@ -172,32 +174,64 @@ uint8_t gridY = 0;
 #define INITIAL_X 20
 #define INITIAL_Y 24
 
+void DrawGrid() BANKED {
+    for (uint8_t i = 0; i<12; i++) {
+        struct pack_card card;
+        bitsToCard(table[i], &card);
+        DrawCard(i % 4, i / 4, card.num + 1, card.colour, card.shape == DIAMOND ? SHAPE_DIAMOND : (card.shape == RECTANGLE ? SHAPE_DIAMOND : SHAPE_SQUISH), card.fill);
+    }
+}
+
 void START(void) {
 	// scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
 	InitScroll(BANK(map), &map, 0, 0);
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
-    DrawCard(0, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_EMPTY);
-    DrawCard(1, 0, 3, COLOUR_RED, SHAPE_DIAMOND, FILL_FILLED);
-    DrawCard(2, 0, 3, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_FILLED);
-    DrawCard(3, 0, 3, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
+    DealGame(0);
 
-    DrawCard(0, 1, 2, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
-    DrawCard(1, 1, 2, COLOUR_RED, SHAPE_RECT, FILL_STRIPED);
-    DrawCard(2, 1, 2, COLOUR_ORANGE, SHAPE_DIAMOND, FILL_STRIPED);
-    DrawCard(3, 1, 2, COLOUR_BLUE, SHAPE_SQUISH, FILL_STRIPED);
-
-    DrawCard(0, 2, 1, COLOUR_RED, SHAPE_RECT, FILL_EMPTY);
-    DrawCard(1, 2, 1, COLOUR_RED, SHAPE_DIAMOND, FILL_STRIPED);
-    DrawCard(2, 2, 1, COLOUR_ORANGE, SHAPE_SQUISH, FILL_FILLED);
-    DrawCard(3, 2, 1, COLOUR_BLUE, SHAPE_DIAMOND, FILL_FILLED);
+    DrawGrid();
 }
 
+uint8_t selectedCard0X = 99;
+uint8_t selectedCard0Y = 99;
+uint8_t selectedCard1X = 99;
+uint8_t selectedCard1Y = 99;
 
 void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
     DrawCardFrame(gridX, gridY, CARD_FRAME_SELECTED);
 
+    if (selectedCard0X != 99) {
+        if (selectedCard1X != 99) {
+            if (IsValidPack(
+                table[(selectedCard0X * 3) + (selectedCard0Y * 4)],
+                table[(selectedCard1X * 3) + (selectedCard1Y * 4)],
+                table[(gridX * 3) + (gridY * 4)]
+            )) {
+                uint8_t gameOver = PickupPack((selectedCard0X * 3) + (selectedCard0Y * 4), (selectedCard1X * 3) + (selectedCard1Y * 4), (gridX * 3) + (gridY * 4));
+                DrawGrid();
+                if (gameOver) {
+                    // do something
+                }
+            } else {
+                // not a valid pack
+                DrawCardFrame(selectedCard0X, selectedCard0Y, CARD_FRAME_DEFAULT);
+                DrawCardFrame(selectedCard1X, selectedCard1Y, CARD_FRAME_DEFAULT);
+                DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
+            }
+            
+            selectedCard0X = 99;
+            selectedCard0Y = 99;
+            selectedCard1X = 99;
+            selectedCard1Y = 99;
+        } else {
+            selectedCard1X = gridX;
+            selectedCard1Y = gridY;
+        }
+    } else {
+        selectedCard0X = gridX;
+        selectedCard0Y = gridY;
+    }
 }
 
 void UPDATE(void) {
