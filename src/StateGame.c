@@ -178,7 +178,14 @@ void DrawGrid() BANKED {
     for (uint8_t i = 0; i<12; i++) {
         struct pack_card card;
         bitsToCard(table[i], &card);
-        DrawCard(i % 4, i / 4, card.num + 1, card.colour, card.shape == DIAMOND ? SHAPE_DIAMOND : (card.shape == RECTANGLE ? SHAPE_DIAMOND : SHAPE_SQUISH), card.fill);
+        DrawCard(
+            i % 4,
+            i / 4,
+            card.num + 1,
+            card.colour,
+            card.shape == DIAMOND ? SHAPE_DIAMOND : (card.shape == RECTANGLE ? SHAPE_RECT : SHAPE_SQUISH),
+            card.fill == FILLED ? FILL_FILLED : (card.fill == STRIPED ? FILL_STRIPED : FILL_EMPTY)
+        );
     }
 }
 

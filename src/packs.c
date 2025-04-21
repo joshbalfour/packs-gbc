@@ -3,7 +3,9 @@
 #include <gb/gb.h>
 #include <string.h>
 
-uint8_t table[12] = {};
+// #include <gbdk/emu_debug.h>
+
+uint8_t table[12] = {0};
 
 void bitsToCard(uint8_t bits, pack_card* outCard) {
     struct pack_card card = {
@@ -13,6 +15,8 @@ void bitsToCard(uint8_t bits, pack_card* outCard) {
         .fill = (bits & 0b110000) >> (2*2),
         .num =( bits & 0b11000000) >> (2*3),
     };
+
+    // EMU_printf("bits=%d => num=%d, colour=%d, shape=%d, fill=%d\n", bits, card.num,card.colour,card.shape,card.fill);
 
     *outCard = card;
 }
@@ -45,8 +49,8 @@ uint8_t IsValidPack(uint8_t card0Bits, uint8_t card1Bits, uint8_t card2Bits) {
     return card2Bits == CalculateThirdCardBits(card0Bits, card1Bits);
 }
 
-uint8_t deck[81] = {};
-uint8_t consumed[171] = {};
+uint8_t deck[81] = {0};
+uint8_t consumed[171] = {0};
 
 uint8_t numInDeck = 0;
 uint8_t numConsumed = 0;
@@ -69,69 +73,61 @@ void PopulateHand(uint8_t singleColor) {
     }
 }
 
-void ClearAll() {
-    for (uint8_t i = 0; i<81; i++) {
-        deck[i] = NULL;
-    }
+void ClearAll(void) {
+    memset(deck, 0, sizeof deck);
     numInDeck = 0;
-    for (uint8_t i = 0; i<170; i++) {
-        consumed[i] = NULL;
-    }
-    numConsumed = 0;
-    for (uint8_t i = 0; i<12; i++) {
-        table[i] = NULL;
-    }
-}
-
-void DealGame(uint8_t singleColor) {
-    // TODO: move this to splash screen
-    uint16_t seed = LY_REG;
-    seed |= (uint16_t)DIV_REG << 8;
-    initrand(seed);
-    // ---
-
-    ClearAll();
-    PopulateHand(singleColor);
-
     memset(consumed, 0, sizeof consumed);
-    // pick 11 cards from deck and add to table
-    for (uint8_t i = 0; i<11; i++) {
-        do {
-            uint8_t r = rand() % numInDeck + 1;
-            if (!consumed[deck[r]]) {
-                table[i] = deck[r];
-                consumed[deck[r]] = 1;
-                numConsumed++;
-            }
-        } while (!table[i]);
-    }
-
-    // pick 2 random cards from table, calculate third card, add to table in random place
-    uint8_t card1Pos = rand() % 11 + 1;
-    uint8_t card2Pos = rand() % 11 + 1;
-    uint8_t cardDestination = rand() % 12 + 1;
-    uint8_t card3Bits = CalculateThirdCardBits(table[card1Pos], table[card2Pos]);
-    if (consumed[card3Bits]) {
-        card3Bits = PickUnconsumedCard();
-    }
-    consumed[card3Bits] = 1;
-    numConsumed++;
-
-    if (table[cardDestination]) {
-        uint8_t origCard = table[cardDestination];
-        table[11] = origCard;
-        table[cardDestination] = card3Bits;
-    }
+    numConsumed = 0;
+    memset(table, 0, sizeof table);
 }
 
-uint8_t PickUnconsumedCard() {
-
+uint8_t PickUnconsumedCard(void) {
     do {
         uint8_t r = rand() % numInDeck + 1;
         if (!consumed[deck[r]]) {
             return deck[r];
         }
     } while (1);
+}
+
+void DealGame(uint8_t singleColor) {
+    // TODO: move this to splash screen
+    // uint16_t seed = LY_REG;
+    // seed |= (uint16_t)DIV_REG << 8;
+    // initrand(seed);
+    // ---
+    initrand(18432);
+
+    ClearAll();
+    PopulateHand(singleColor);
+
+    // pick 11 cards from deck and add to table
+    for (uint8_t i = 0; i<11; i++) {
+        table[i] = PickUnconsumedCard();
+        consumed[table[i]] = 1;
+        numConsumed++;
+    }
+
+    // pick 2 random cards from table, calculate third card, add to table in random place
+    uint8_t card1Pos = rand() % 10 + 1;
+    uint8_t card2Pos = rand() % 10 + 1;
+    while (card1Pos == card2Pos) {
+        card2Pos = rand() % 10 + 1;
+    }
+    uint8_t cardDestination = rand() % 11 + 1;
+    uint8_t card3Bits = CalculateThirdCardBits(table[card1Pos], table[card2Pos]);
+    if (consumed[card3Bits]) {
+        card3Bits = PickUnconsumedCard();
+        consumed[card3Bits] = 1;
+        numConsumed++;
+    }
+
+    if (table[cardDestination]) {
+        uint8_t origCard = table[cardDestination];
+        table[11] = origCard;
+    }
+
+    table[cardDestination] = card3Bits;
 }
 
 uint8_t TableHasPack(uint8_t tableToTest[12]) {
@@ -168,7 +164,7 @@ uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2Ta
     uint8_t newCard1 = 0;
     uint8_t newCard2 = 0;
 
-    uint8_t newTable[12] = {};
+    uint8_t newTable[12] = {0};
 
     do {
         // pick 3 random cards
