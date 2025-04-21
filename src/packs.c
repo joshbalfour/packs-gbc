@@ -125,13 +125,13 @@ void DealGame(uint8_t singleColor) {
 }
 
 uint8_t PickUnconsumedCard() {
-    uint8_t cardIsConsumed = 1;
-    uint8_t cardIdx = 0;
-    while (cardIsConsumed) {
-        cardIdx = rand() % numInDeck + 1;
-        cardIsConsumed = consumed[deck[cardIdx]];
-    }
-    return deck[cardIdx];
+
+    do {
+        uint8_t r = rand() % numInDeck + 1;
+        if (!consumed[deck[r]]) {
+            return deck[r];
+        }
+    } while (1);
 }
 
 uint8_t TableHasPack(uint8_t tableToTest[12]) {

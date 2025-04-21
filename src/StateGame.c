@@ -188,7 +188,7 @@ void START(void) {
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
-    DealGame(0);
+    DealGame(1);
 
     DrawGrid();
 }
