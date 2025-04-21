@@ -204,11 +204,11 @@ void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
     if (selectedCard0X != 99) {
         if (selectedCard1X != 99) {
             if (IsValidPack(
-                table[(selectedCard0X * 3) + (selectedCard0Y * 4)],
-                table[(selectedCard1X * 3) + (selectedCard1Y * 4)],
-                table[(gridX * 3) + (gridY * 4)]
+                table[selectedCard0X + (selectedCard0Y*4)],
+                table[selectedCard1X + (selectedCard1Y*4)],
+                table[gridX + (gridY*4)]
             )) {
-                uint8_t gameOver = PickupPack((selectedCard0X * 3) + (selectedCard0Y * 4), (selectedCard1X * 3) + (selectedCard1Y * 4), (gridX * 3) + (gridY * 4));
+                uint8_t gameOver = PickupPack(selectedCard0X + (selectedCard0Y*4), selectedCard1X + (selectedCard1Y*4), gridX + (gridY*4));
                 DrawGrid();
                 if (gameOver) {
                     // do something
