@@ -74,7 +74,7 @@ uint16_t map_offset = 0;
 #define CARD_FRAME_OFFSET 0
 
 void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
-    unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x03 : 0x01);
+    unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x04 : 0x01);
     uint8_t palette = (UINT8)(BANK(cardtiles) >> 8) + pal;
 
     uint8_t x = HORIZ_SPACING * gridX;
