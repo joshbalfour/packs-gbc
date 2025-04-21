@@ -154,9 +154,9 @@ uint8_t TableHasPack(uint8_t tableToTest[12]) {
 // returns if the game is over
 uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2TablePos) {
     if (numInDeck - numConsumed == 0) {
-        table[card0TablePos] = NULL;
-        table[card1TablePos] = NULL;
-        table[card2TablePos] = NULL;
+        table[card0TablePos] = UINT8_MAX;
+        table[card1TablePos] = UINT8_MAX;
+        table[card2TablePos] = UINT8_MAX;
         return !TableHasPack(table);
     }
 
@@ -170,7 +170,16 @@ uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2Ta
         // pick 3 random cards
         newCard0 = PickUnconsumedCard();
         newCard1 = PickUnconsumedCard();
+
+        while (newCard0 == newCard1) {
+            newCard1 = PickUnconsumedCard();
+        }
+
         newCard2 = PickUnconsumedCard();
+        while (newCard1 == newCard2 || newCard0 == newCard2) {
+            newCard2 = PickUnconsumedCard();
+        }
+
         for (uint8_t i = 0; i<12; i++) {
             // put on the table
             if (i == card0TablePos) {

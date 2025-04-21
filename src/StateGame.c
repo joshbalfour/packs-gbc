@@ -166,6 +166,18 @@ void DrawCard (uint8_t gridX, uint8_t gridY, uint8_t num, uint8_t colour, uint8_
     }
 }
 
+void DrawEmptyCard(uint8_t gridX, uint8_t gridY) {
+    DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
+    uint8_t x = X_START + (HORIZ_SPACING * gridX);
+    uint8_t y = Y_START + (VERT_SPACING * gridY);
+
+    for (uint8_t cy = 0; cy<4; cy++) {
+        UpdateMapTile(TARGET_BKG, x, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
+        UpdateMapTile(TARGET_BKG, x + 1, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
+        UpdateMapTile(TARGET_BKG, x + 2, y + cy, BANK(map), BLANK_CARD_BG_TILE, NULL);
+    }
+}
+
 Sprite* selectorSpr;
 
 uint8_t gridX = 0;
@@ -174,18 +186,23 @@ uint8_t gridY = 0;
 #define INITIAL_X 20
 #define INITIAL_Y 24
 
-void DrawGrid() BANKED {
+void DrawGrid(void) BANKED {
     for (uint8_t i = 0; i<12; i++) {
-        struct pack_card card;
-        bitsToCard(table[i], &card);
-        DrawCard(
-            i % 4,
-            i / 4,
-            card.num + 1,
-            card.colour,
-            card.shape == DIAMOND ? SHAPE_DIAMOND : (card.shape == RECTANGLE ? SHAPE_RECT : SHAPE_SQUISH),
-            card.fill == FILLED ? FILL_FILLED : (card.fill == STRIPED ? FILL_STRIPED : FILL_EMPTY)
-        );
+        if (table[i] == UINT8_MAX) {
+            // empty space
+            DrawEmptyCard(i % 4, i / 4);
+        } else {
+            struct pack_card card;
+            bitsToCard(table[i], &card);
+            DrawCard(
+                i % 4,
+                i / 4,
+                card.num + 1,
+                card.colour,
+                card.shape == DIAMOND ? SHAPE_DIAMOND : (card.shape == RECTANGLE ? SHAPE_RECT : SHAPE_SQUISH),
+                card.fill == FILLED ? FILL_FILLED : (card.fill == STRIPED ? FILL_STRIPED : FILL_EMPTY)
+            );
+        }
     }
 }
 
@@ -200,16 +217,38 @@ void START(void) {
     DrawGrid();
 }
 
-uint8_t selectedCard0X = 99;
-uint8_t selectedCard0Y = 99;
-uint8_t selectedCard1X = 99;
-uint8_t selectedCard1Y = 99;
+uint8_t selectedCard0X = UINT8_MAX;
+uint8_t selectedCard0Y = UINT8_MAX;
+uint8_t selectedCard1X = UINT8_MAX;
+uint8_t selectedCard1Y = UINT8_MAX;
 
 void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
+    if (table[gridX + (gridY*4)] == UINT8_MAX) {
+       return; 
+    }
+
+    if (selectedCard0X != UINT8_MAX) {
+        if (gridX == selectedCard0X && gridY == selectedCard0Y) {
+            DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
+            selectedCard0X = UINT8_MAX;
+            selectedCard0Y = UINT8_MAX;
+            return;
+        }
+    }
+
+    if (selectedCard1X != UINT8_MAX) {
+        if (gridX == selectedCard1X && gridY == selectedCard1Y) {
+            DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
+            selectedCard1X = UINT8_MAX;
+            selectedCard1Y = UINT8_MAX;
+            return;
+        }
+    }
+
     DrawCardFrame(gridX, gridY, CARD_FRAME_SELECTED);
 
-    if (selectedCard0X != 99) {
-        if (selectedCard1X != 99) {
+    if (selectedCard0X != UINT8_MAX) {
+        if (selectedCard1X != UINT8_MAX) {
             if (IsValidPack(
                 table[selectedCard0X + (selectedCard0Y*4)],
                 table[selectedCard1X + (selectedCard1Y*4)],
@@ -218,7 +257,7 @@ void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
                 uint8_t gameOver = PickupPack(selectedCard0X + (selectedCard0Y*4), selectedCard1X + (selectedCard1Y*4), gridX + (gridY*4));
                 DrawGrid();
                 if (gameOver) {
-                    // do something
+                    SetState(StateDone);
                 }
             } else {
                 // not a valid pack
@@ -227,10 +266,10 @@ void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
                 DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
             }
             
-            selectedCard0X = 99;
-            selectedCard0Y = 99;
-            selectedCard1X = 99;
-            selectedCard1Y = 99;
+            selectedCard0X = UINT8_MAX;
+            selectedCard0Y = UINT8_MAX;
+            selectedCard1X = UINT8_MAX;
+            selectedCard1Y = UINT8_MAX;
         } else {
             selectedCard1X = gridX;
             selectedCard1Y = gridY;
