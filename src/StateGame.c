@@ -206,13 +206,14 @@ void DrawGrid(void) BANKED {
     }
 }
 
+uint8_t singleColourGame = 0;
 void START(void) {
 	// scroll_target = SpriteManagerAdd(SpritePlayer, 50, 50);
 	InitScroll(BANK(map), &map, 0, 0);
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
-    DealGame(1);
+    DealGame(singleColourGame);
 
     DrawGrid();
 }

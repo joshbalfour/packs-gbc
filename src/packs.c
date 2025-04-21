@@ -91,13 +91,6 @@ uint8_t PickUnconsumedCard(void) {
 }
 
 void DealGame(uint8_t singleColor) {
-    // TODO: move this to splash screen
-    // uint16_t seed = LY_REG;
-    // seed |= (uint16_t)DIV_REG << 8;
-    // initrand(seed);
-    // ---
-    initrand(18432);
-
     ClearAll();
     PopulateHand(singleColor);
 
