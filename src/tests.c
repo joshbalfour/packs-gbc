@@ -7,6 +7,13 @@ uint8_t RunTest(uint8_t singleColour, uint16_t seed) {
     initrand(seed);
     DealGame(singleColour);
 
+    if (TableHasDupes(table)) {
+        // log error
+        // table has dupes
+        EMU_printf("dupes after turn=%d\n",0);
+        return 7;
+    }
+
     uint8_t gameOver = 0;
     uint8_t turn = 0;
     while (!gameOver) {        
@@ -34,6 +41,7 @@ uint8_t RunTest(uint8_t singleColour, uint16_t seed) {
         if (TableHasDupes(table)) {
             // log error
             // table has dupes
+            EMU_printf("dupes after turn=%d\n",turn);
             return 1;
         }
     }
