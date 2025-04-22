@@ -2,7 +2,7 @@
 #include <rand.h>
 #include <string.h>
 
-#include <gbdk/emu_debug.h>
+// #include <gbdk/emu_debug.h>
 
 uint8_t table[12] = {0};
 
@@ -245,7 +245,7 @@ uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2Ta
 
     if ((numInDeck - numConsumed) < 3) {
         // something went wrong
-        EMU_printf("numInDeck=%d, numConsumed=%d\n", numInDeck, numConsumed);
+        // EMU_printf("numInDeck=%d, numConsumed=%d\n", numInDeck, numConsumed);
         return 4;
     }
 
