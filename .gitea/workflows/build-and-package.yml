@@ -48,4 +48,4 @@ jobs:
       uses: christopherhx/gitea-upload-artifact@v4
       with:
         name: ROM-files
-        path: bin/
+        path: bin/gbc/*.gbc
