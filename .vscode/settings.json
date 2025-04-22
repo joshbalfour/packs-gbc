@@ -24,6 +24,8 @@
         "flip.h": "c",
         "sprite.h": "c",
         "packs.h": "c",
-        "gb.h": "c"
+        "gb.h": "c",
+        "rand.h": "c",
+        "emu_debug.h": "c"
     }
 }

@@ -24,6 +24,12 @@ enum COUNT {
     THREE_SHAPE,
 };
 
+typedef struct PackPos {
+    uint8_t firstCardPos;
+    uint8_t secondCardPos;
+    uint8_t thirdCardPos;
+} PackPos;
+
 typedef struct pack_card {
     enum Colour colour;
     enum Shape shape;
@@ -40,3 +46,7 @@ uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2Ta
 void DealGame(uint8_t singleColor);
 
 extern uint8_t table[12];
+
+// for testing
+uint8_t TableHasDupes(uint8_t tableToTest[12]);
+void FindPack(uint8_t tableToTest[12], struct PackPos* outPackPos);

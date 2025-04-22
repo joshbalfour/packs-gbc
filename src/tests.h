@@ -1,0 +1,1 @@
+uint8_t RunTest(uint8_t singleColour, uint16_t seed);

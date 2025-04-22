@@ -1,9 +1,8 @@
 #include "packs.h"
 #include <rand.h>
-#include <gb/gb.h>
 #include <string.h>
 
-// #include <gbdk/emu_debug.h>
+#include <gbdk/emu_debug.h>
 
 uint8_t table[12] = {0};
 
@@ -55,7 +54,7 @@ uint8_t consumed[171] = {0};
 uint8_t numInDeck = 0;
 uint8_t numConsumed = 0;
 
-void PopulateHand(uint8_t singleColor) {
+void PopulateDeck(uint8_t singleColor) {
     for (uint8_t num = 0; num<3; num++) {
         for (uint8_t shape = 0; shape<3; shape++) {
             for (uint8_t fill = 0; fill<3; fill++) {
@@ -82,17 +81,21 @@ void ClearAll(void) {
 }
 
 uint8_t PickUnconsumedCard(void) {
-    do {
-        uint8_t r = rand() % numInDeck + 1;
-        if (!consumed[deck[r]]) {
-            return deck[r];
+    uint8_t r = rand() % numInDeck + 1;
+
+    for (uint8_t c = 0; c < numInDeck; c++) {
+        uint8_t idx = (r + c) % numInDeck;
+        if (!consumed[deck[idx]]) {
+            return deck[idx];
         }
-    } while (1);
+    }
+
+    return UINT8_MAX;
 }
 
 void DealGame(uint8_t singleColor) {
     ClearAll();
-    PopulateHand(singleColor);
+    PopulateDeck(singleColor);
 
     // pick 11 cards from deck and add to table
     for (uint8_t i = 0; i<11; i++) {
@@ -123,22 +126,72 @@ void DealGame(uint8_t singleColor) {
     table[cardDestination] = card3Bits;
 }
 
-uint8_t TableHasPack(uint8_t tableToTest[12]) {
-    // for every 2 card combo
+uint8_t TableHasDupes(uint8_t tableToTest[12]) {
     for (uint8_t firstCardPos = 0; firstCardPos<12; firstCardPos++) {
         for (uint8_t secondCardPos = 0; secondCardPos<12; secondCardPos++) {
             if (firstCardPos != secondCardPos) {
-                // calc third
-                uint8_t card3Bits = CalculateThirdCardBits(tableToTest[firstCardPos], tableToTest[secondCardPos]);
-                for (uint8_t possThirdCardPos = 0; possThirdCardPos<12; possThirdCardPos++) {
-                    if (possThirdCardPos != firstCardPos && possThirdCardPos != secondCardPos) {
-                        // is it on the table?
-                        if (tableToTest[possThirdCardPos] == card3Bits) {
-                            return 1;
-                        }
+                if (tableToTest[firstCardPos] == tableToTest[secondCardPos]) {
+                    if (tableToTest[firstCardPos] != UINT8_MAX) {
+                        return 1;
                     }
                 }
             }
+        }
+    }
+
+    return 0;
+}
+
+void FindPack(uint8_t tableToTest[12], struct PackPos* outPackPos) {
+    struct PackPos packPos = {
+        .firstCardPos = UINT8_MAX,
+        .secondCardPos = UINT8_MAX,
+        .thirdCardPos = UINT8_MAX,
+    };
+    *outPackPos = packPos;
+
+    // for every 2 card combo
+    for (uint8_t firstCardPos = 0; firstCardPos<12; firstCardPos++) {
+        if (tableToTest[firstCardPos] == UINT8_MAX) {
+            continue;
+        }
+
+        for (uint8_t secondCardPos = 0; secondCardPos<12; secondCardPos++) {
+            if (tableToTest[secondCardPos] == UINT8_MAX) {
+                continue;
+            }
+            if (firstCardPos == secondCardPos) {
+                continue;
+            }
+
+            // calc third
+            uint8_t card3Bits = CalculateThirdCardBits(tableToTest[firstCardPos], tableToTest[secondCardPos]);
+            for (uint8_t possThirdCardPos = 0; possThirdCardPos<12; possThirdCardPos++) {
+                if (possThirdCardPos != firstCardPos && possThirdCardPos != secondCardPos) {
+                    // is it on the table?
+                    if (tableToTest[possThirdCardPos] == card3Bits) {
+                        outPackPos->firstCardPos = firstCardPos;
+                        outPackPos->secondCardPos = secondCardPos;
+                        outPackPos->thirdCardPos = possThirdCardPos;
+
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+uint8_t TableHasPack(uint8_t tableToTest[12]) {
+    struct PackPos pp;
+    FindPack(tableToTest, &pp);
+    return pp.firstCardPos != UINT8_MAX;
+}
+
+uint8_t TableHasCard(uint8_t tableToTest[12], uint8_t cardToFind) {
+    for (uint8_t i = 0; i<12; i++) {
+        if (tableToTest[i] == cardToFind) {
+            return 1;
         }
     }
     return 0;
@@ -146,56 +199,103 @@ uint8_t TableHasPack(uint8_t tableToTest[12]) {
 
 // returns if the game is over
 uint8_t PickupPack(uint8_t card0TablePos, uint8_t card1TablePos, uint8_t card2TablePos) {
-    if (numInDeck - numConsumed == 0) {
+    // EMU_printf("numInDeck=%d, numConsumed=%d\n", numInDeck, numConsumed);
+    if ((numInDeck - numConsumed) == 0) {
         table[card0TablePos] = UINT8_MAX;
         table[card1TablePos] = UINT8_MAX;
         table[card2TablePos] = UINT8_MAX;
         return !TableHasPack(table);
     }
 
-    uint8_t newCard0 = 0;
-    uint8_t newCard1 = 0;
-    uint8_t newCard2 = 0;
+    if ((numInDeck - numConsumed) < 3) {
+        // something went wrong
+        EMU_printf("numInDeck=%d, numConsumed=%d\n", numInDeck, numConsumed);
+        return 4;
+    }
+
+    // pick 2 random unconsumed cards from the deck
+    uint8_t newCard0 = PickUnconsumedCard();
+    uint8_t newCard1 = PickUnconsumedCard();
+    while (newCard0 == newCard1) {
+        newCard1 = PickUnconsumedCard();
+    }
 
     uint8_t newTable[12] = {0};
 
-    do {
-        // pick 3 random cards
-        newCard0 = PickUnconsumedCard();
-        newCard1 = PickUnconsumedCard();
+    for (uint8_t i = 0; i<12; i++) {
+        if (i == card0TablePos) {
+            newTable[i] = newCard0;
+        } else if (i == card1TablePos) {
+            newTable[i] = newCard1;
+        } else if (i == card2TablePos) {
+            newTable[i] = UINT8_MAX;
+        } else {
+            newTable[i] = table[i];
+        }
+    }
 
-        while (newCard0 == newCard1) {
-            newCard1 = PickUnconsumedCard();
+    uint8_t newCard2 = UINT8_MAX;
+    for (uint8_t r1 = 0; r1<12; r1++) {
+        if (newTable[r1] == UINT8_MAX) {
+            continue;
         }
 
-        newCard2 = PickUnconsumedCard();
-        while (newCard1 == newCard2 || newCard0 == newCard2) {
-            newCard2 = PickUnconsumedCard();
-        }
-
-        for (uint8_t i = 0; i<12; i++) {
-            // put on the table
-            if (i == card0TablePos) {
-                newTable[i] = newCard0;
-            } else if (i == card1TablePos) {
-                newTable[i] = newCard1;
-            } else if (i == card2TablePos) {
-                newTable[i] = newCard2;
-            } else {
-                newTable[i] = table[i];
+        for (uint8_t r2 = 0; r2<12; r2++) {
+            if (newTable[r2] == UINT8_MAX || r2 == r1) {
+                continue;
             }
+
+            // calc 3rd
+            newCard2 = CalculateThirdCardBits(newTable[r1], newTable[r2]);
+        
+            if (consumed[newCard2]) {
+                // is it on the table?
+                if (TableHasCard(newTable, newCard2)) {
+                    // pick random unconsumed card from deck
+                    newCard2 = PickUnconsumedCard();
+                    while (newCard2 == newCard0 || newCard2 == newCard1) {
+                        newCard2 = PickUnconsumedCard();
+                    }
+                } else {
+                    newCard2 = UINT8_MAX;
+                }
+            } // otherwise, use it
         }
-    } while (!TableHasPack(newTable));
+    }
+
+    // if no pack ever found, game over
+    if (newCard2 == UINT8_MAX) {
+        return 1;
+    }
 
     consumed[newCard0] = 1;
     numConsumed++;
     consumed[newCard1] = 1;
     numConsumed++;
-    consumed[newCard2] = 1;
-    numConsumed++;
+    if (!consumed[newCard2]) {
+        consumed[newCard2] = 1;
+        numConsumed++;
+    }
 
+    uint8_t r = rand() % 2; // 1 or 0
     for (uint8_t i = 0; i<12; i++) {
-        table[i] = newTable[i];
+        if (i == card0TablePos) {
+            if (r) {
+                table[i] = newCard0;
+            } else {
+                table[1] = newCard2;
+            }
+        } else if (i == card1TablePos) {
+            table[i] = newCard1;
+        } else if (i == card2TablePos) {
+            if (!r) {
+                table[i] = newCard0;
+            } else {
+                table[1] = newCard2;
+            }
+        } else {
+            table[i] = table[i];
+        }
     }
 
     return 0;

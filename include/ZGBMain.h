@@ -6,6 +6,7 @@ _STATE(StateGame)\
 _STATE(StateDone)\
 _STATE(StatePreSplash)\
 _STATE(StateSplash)\
+_STATE(StateTest)\
 _STATE(StateMenu)\
 STATE_DEF_END
 
