@@ -5,8 +5,6 @@
 
 IMPORT_HICOLOR(packsinc);
 
-UINT8 scroll_limit;
-
 void START(void) {
 	// uninstall the standard LCD routine (used for the overlay window)
 	LCD_uninstall();
