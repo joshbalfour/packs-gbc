@@ -2,7 +2,6 @@
 
 #include "Keys.h"
 #include "ZGBMain.h"
-#include "SpriteManager.h"
 
 #include "StateGame.h"
 

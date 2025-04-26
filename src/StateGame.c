@@ -210,12 +210,18 @@ void DrawGrid(void) BANKED {
 }
 
 uint8_t singleColourGame = 0;
+uint8_t resumeGame = 0;
 void START(void) {
 	map_offset = ScrollSetTiles(0, BANK(cardtiles), &cardtiles);
 
     selectorSpr = SpriteManagerAdd(SpriteSelector, INITIAL_X, INITIAL_Y);
 
-    DealGame(singleColourGame);
+    if (resumeGame) {
+        resumeGame = 0;
+        fade_enabled = TRUE;
+    } else {
+        DealGame(singleColourGame);
+    }
 
     DrawGrid();
 }
@@ -325,5 +331,10 @@ void UPDATE(void) {
 
     if (KEY_TICKED(J_A)) {
         SelectCard(gridX, gridY);
+    }
+
+    if (KEY_TICKED(J_START)) {
+        fade_enabled = FALSE;
+        SetState(StatePaused);
     }
 }

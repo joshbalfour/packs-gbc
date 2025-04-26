@@ -8,11 +8,11 @@ _STATE(StatePreSplash)\
 _STATE(StateSplash)\
 _STATE(StateTest)\
 _STATE(StateMenu)\
+_STATE(StatePaused)\
 STATE_DEF_END
 
 #define SPRITES \
 _SPRITE(SpriteSelector, selector, FLIP_NONE)\
-_SPRITE(SpriteArrow, arrow, FLIP_NONE)\
 SPRITE_DEF_END
 
 #include "ZGBMain_Init.h"
