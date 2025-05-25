@@ -7,6 +7,7 @@
 #include "Keys.h"
 
 #include "packs.h"
+#include "Sound.h"
 
 IMPORT_TILES(cardtiles);
 
@@ -74,7 +75,9 @@ uint16_t map_offset = 0;
 #define CARD_FRAME_OFFSET 0
 
 void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
-    unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x04 : 0x01);
+    // error = 0x05
+    // success = 0x06
+    unsigned char pal = frameType == CARD_FRAME_DEFAULT ? 0x00 : (frameType == CARD_FRAME_SELECTED ? 0x04 : (frameType == CARD_FRAME_ERROR ? 0x05 : (frameType == CARD_FRAME_SUCCESS ? 0x06 : 0x01)));
     uint8_t palette = (UINT8)(BANK(cardtiles) >> 8) + pal;
 
     uint8_t x = HORIZ_SPACING * gridX;
@@ -230,6 +233,13 @@ uint8_t selectedCard0X = UINT8_MAX;
 uint8_t selectedCard0Y = UINT8_MAX;
 uint8_t selectedCard1X = UINT8_MAX;
 uint8_t selectedCard1Y = UINT8_MAX;
+uint8_t selectedCard2X = UINT8_MAX;
+uint8_t selectedCard2Y = UINT8_MAX;
+
+uint8_t playSuccess = 0;
+uint8_t playFail = 0;
+uint8_t sndTick = 0;
+uint8_t waitFor = 20;
 
 void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
     if (table[gridX + (gridY*4)] == UINT8_MAX) {
@@ -258,38 +268,88 @@ void SelectCard(uint8_t gridX, uint8_t gridY) BANKED {
 
     if (selectedCard0X != UINT8_MAX) {
         if (selectedCard1X != UINT8_MAX) {
+            PlayFx(CHANNEL_1, 10, 0x00, 0x8A, 0xA3, 0xC9, 0x86);
+            selectedCard2X = gridX;
+            selectedCard2Y = gridY;
             if (IsValidPack(
                 table[selectedCard0X + (selectedCard0Y*4)],
                 table[selectedCard1X + (selectedCard1Y*4)],
                 table[gridX + (gridY*4)]
             )) {
-                uint8_t gameOver = PickupPack(selectedCard0X + (selectedCard0Y*4), selectedCard1X + (selectedCard1Y*4), gridX + (gridY*4));
+                sndTick = 0;
+                playSuccess = 1;
+            } else {
+                // not a valid pack
+                sndTick = 0;
+                playFail = 1;
+            }
+        } else {
+            PlayFx(CHANNEL_1, 10, 0x00, 0x8A, 0xA3, 0xA9, 0x86);
+            selectedCard1X = gridX;
+            selectedCard1Y = gridY;
+        }
+    } else {
+        PlayFx(CHANNEL_1, 10, 0x00, 0x8A, 0xA3, 0x81, 0x86);
+        selectedCard0X = gridX;
+        selectedCard0Y = gridY;
+    }
+}
+
+void SoundTicker(void) BANKED {
+    if (playSuccess || playFail) {
+        // if (sndTick == (0 + waitFor)) {
+        //     PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0xA9, 0x86);
+        // }
+        if (sndTick == waitFor) {
+            DrawCardFrame(selectedCard0X, selectedCard0Y, playFail ? CARD_FRAME_ERROR : CARD_FRAME_SUCCESS);
+            DrawCardFrame(selectedCard1X, selectedCard1Y, playFail ? CARD_FRAME_ERROR : CARD_FRAME_SUCCESS);
+            DrawCardFrame(selectedCard2X, selectedCard2Y, playFail ? CARD_FRAME_ERROR : CARD_FRAME_SUCCESS);
+        }
+        if (sndTick == (5 + waitFor)) {
+            PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0x81, 0x86);
+        }
+        if (sndTick == (10 + waitFor)) {
+            PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0xC9, 0x86);
+        }
+        if (sndTick == (15 + waitFor)) {
+            PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0xEF, 0x86);
+        }
+        if (sndTick == (20 + waitFor)) {
+            if (playFail) {
+                PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0xA9, 0x86);
+                DrawCardFrame(selectedCard0X, selectedCard0Y, CARD_FRAME_DEFAULT);
+                DrawCardFrame(selectedCard1X, selectedCard1Y, CARD_FRAME_DEFAULT);
+                DrawCardFrame(selectedCard2X, selectedCard2Y, CARD_FRAME_DEFAULT);
+            } else if (playSuccess) {
+                PlayFx(CHANNEL_1, 3, 0x00, 0x8A, 0xA3, 0xFF, 0x86);
+                uint8_t gameOver = PickupPack(selectedCard0X + (selectedCard0Y*4), selectedCard1X + (selectedCard1Y*4), selectedCard2X + (selectedCard2Y*4));
                 DrawGrid();
                 if (gameOver) {
                     SetState(StateDone);
                 }
-            } else {
-                // not a valid pack
-                DrawCardFrame(selectedCard0X, selectedCard0Y, CARD_FRAME_DEFAULT);
-                DrawCardFrame(selectedCard1X, selectedCard1Y, CARD_FRAME_DEFAULT);
-                DrawCardFrame(gridX, gridY, CARD_FRAME_DEFAULT);
             }
             
             selectedCard0X = UINT8_MAX;
             selectedCard0Y = UINT8_MAX;
             selectedCard1X = UINT8_MAX;
             selectedCard1Y = UINT8_MAX;
-        } else {
-            selectedCard1X = gridX;
-            selectedCard1Y = gridY;
+            selectedCard2X = UINT8_MAX;
+            selectedCard2Y = UINT8_MAX;
+
+            playSuccess = 0;
+            playFail = 0;
         }
-    } else {
-        selectedCard0X = gridX;
-        selectedCard0Y = gridY;
+        sndTick++;
     }
 }
 
 void UPDATE(void) {
+    SoundTicker();
+
+    if (playSuccess || playFail) {
+        return;
+    }
+
     if(KEY_TICKED(J_UP)) {
         if (!gridY) {
             gridY = 2;
