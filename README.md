@@ -17,3 +17,25 @@ orange:
     r: 30
     g: 13
     b: 0
+
+Product
+    cart
+        14 usd + tax + shipping
+        custom boot logo
+            + 7 usd
+        insideGadgets
+
+    shell
+        3.5 usd + tax + shipping
+        insideGadgets
+
+    case
+        5.75 gbp
+        https://retrosix.co.uk/Universal-Game-Cases-Game-Boy-Color-Advance-p158344576
+
+    self print:
+        cart sticker (sticker paper + cut)
+        case cover (A4 paper)
+        manual
+
+        https://soully.itch.io/game-boy-instruction-manual-figma-template
