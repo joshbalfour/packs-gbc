@@ -6,6 +6,12 @@
 IMPORT_HICOLOR(packsinc);
 
 void START(void) {
+
+    if (!DEVICE_SUPPORTS_COLOR) {
+        SetState(StateSplash);
+        return;
+    }
+
 	// uninstall the standard LCD routine (used for the overlay window)
 	LCD_uninstall();
 	// disable fading between the state transitions

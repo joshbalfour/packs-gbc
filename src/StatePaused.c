@@ -14,7 +14,7 @@ void START(void) {
 void UPDATE(void) {
     if (KEY_TICKED(J_START)) {
         fade_enabled = TRUE;
-        SetState(StateMenu);
+        SetState(DEVICE_SUPPORTS_COLOR ? StateMenu : StateSplash);
     }
 
     if (KEY_TICKED(J_SELECT | J_A | J_B)) {

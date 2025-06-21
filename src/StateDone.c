@@ -10,7 +10,7 @@ void START(void) {
 
 void UPDATE(void) {
     if (KEY_TICKED(J_START | J_A | J_B)) {
-        SetState(StateMenu);
+        SetState(DEVICE_SUPPORTS_COLOR ? StateMenu : StateSplash);
     }
 }
 

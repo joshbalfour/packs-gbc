@@ -3,6 +3,7 @@
 #include <gb/gb.h>
 #include "Keys.h"
 #include "ZGBMain.h"
+#include "StateGame.h"
 
 IMPORT_MAP(splash);
 
@@ -16,7 +17,8 @@ void UPDATE(void) {
         seed |= (uint16_t)DIV_REG << 8;
         initrand(seed);
 
-        SetState(StateMenu);
+        singleColourGame = 1;
+        SetState(DEVICE_SUPPORTS_COLOR ? StateMenu : StateGame);
     }
 }
 
