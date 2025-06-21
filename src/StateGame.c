@@ -83,11 +83,18 @@ void DrawCardFrame (uint8_t gridX, uint8_t gridY, uint8_t frameType) BANKED {
     uint8_t x = HORIZ_SPACING * gridX;
     uint8_t y = VERT_SPACING * gridY;
 
+    
     UpdateMapTile(TARGET_BKG, x, y, map_offset, 4 + CARD_FRAME_OFFSET, &palette);
     UpdateMapTile(TARGET_BKG, x + 1, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
     UpdateMapTile(TARGET_BKG, x + 2, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
     UpdateMapTile(TARGET_BKG, x + 3, y, map_offset, 7 + CARD_FRAME_OFFSET, &palette);
-    UpdateMapTile(TARGET_BKG, x + 4, y, map_offset, 1 + CARD_FRAME_OFFSET, &palette);
+
+    if (DEVICE_SUPPORTS_COLOR || frameType != CARD_FRAME_SELECTED) {
+        UpdateMapTile(TARGET_BKG, x + 4, y, map_offset, 1 + CARD_FRAME_OFFSET, &palette);
+    } else {
+        UpdateMapTile(TARGET_BKG, x + 4, y, map_offset, 0, &palette);
+    }
+    
 
     UpdateMapTile(TARGET_BKG, x, y + 1, map_offset, 5 + CARD_FRAME_OFFSET, &palette);
     UpdateMapTile(TARGET_BKG, x + 4, y + 1, map_offset, 2 + CARD_FRAME_OFFSET, &palette);
