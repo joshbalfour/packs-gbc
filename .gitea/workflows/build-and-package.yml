@@ -47,6 +47,13 @@ jobs:
     - name: Run custom logo tool
       run: npx -y @joshbalfour/gb-custom-logo@latest
 
+    - name: Build and run insidegadgets logo appender
+      run: |
+        cd logo-appender
+        make
+        ../
+        ./logo-appender/custom_logo_appender_v1.0 ./bin/gbc/ZGB_TEMPLATE.gbc ./bin/gbc/ZGB_TEMPLATE.patched.gbc
+
     - name: Upload build artifacts
       uses: christopherhx/gitea-upload-artifact@v4
       with:
