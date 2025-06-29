@@ -26,6 +26,8 @@
         "packs.h": "c",
         "gb.h": "c",
         "rand.h": "c",
-        "emu_debug.h": "c"
+        "emu_debug.h": "c",
+        "sound.h": "c",
+        "music.h": "c"
     }
 }

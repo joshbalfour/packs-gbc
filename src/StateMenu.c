@@ -4,8 +4,11 @@
 #include "ZGBMain.h"
 
 #include "StateGame.h"
+#include "Sound.h"
 
 IMPORT_MAP(menu);
+
+DECLARE_SFX(bark);
 
 uint8_t choice;
 uint16_t menu_map_offset;
@@ -13,9 +16,7 @@ uint16_t menu_map_offset;
 void START(void) {
     choice = 1;
 
-    NR52_REG = 0x80; //Enables sound, you should always setup this first
-	NR51_REG = 0xFF; //Enables all channels (left and right)
-	NR50_REG = 0x77; //Max volume
+    sfx_sound_init();
 
     LoadMap(TARGET_BKG, 0, 0, BANK(menu), &menu);
 }
@@ -64,6 +65,29 @@ void Selected(uint8_t isBottom, uint8_t isEmpty) BANKED {
     UpdateMapTile(TARGET_BKG, 13, 11 + isBottom, menu_map_offset, isEmpty ? 1 : 84, 0);
 }
 
+
+uint8_t playingBorkSound = 0;
+
+// bork voice indicator: 7,3 = 18 & 7,4 = 31
+
+uint8_t borksndTick=0;
+uint8_t isEmpty=0;
+void PlayBorkSound(void) BANKED {
+    if (borksndTick % 10 == 0) {
+        isEmpty = !isEmpty;
+    }
+
+    UpdateMapTile(TARGET_BKG, 7, 3, menu_map_offset, isEmpty ? 1 : 18, 0);
+    UpdateMapTile(TARGET_BKG, 7, 4, menu_map_offset, isEmpty ? 1 : 31, 0);
+
+    borksndTick++;
+
+    if (borksndTick == 40) {
+        borksndTick = 0;
+        playingBorkSound = 0;
+    }
+}
+
 void UPDATE(void) {
     if(KEY_TICKED(J_UP) || KEY_TICKED(J_DOWN)) {
         choice = !choice;
@@ -80,7 +104,16 @@ void UPDATE(void) {
         singleColourGame = choice;
         SetState(StateGame);
     }
+
+    if (playingBorkSound) {
+        PlayBorkSound();
+    } else if (KEY_TICKED(J_SELECT)) {
+        ExecuteSFX(BANK(bark), bark, SFX_MUTE_MASK(bark), SFX_PRIORITY_NORMAL);
+        playingBorkSound = 1;
+    }
 }
+
+
 
 void DESTROY(void) {
 }
