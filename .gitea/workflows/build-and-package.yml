@@ -51,7 +51,7 @@ jobs:
       run: |
         cd logo-appender
         make
-        ../
+        cd ../
         ./logo-appender/custom_logo_appender_v1.0 ./bin/gbc/ZGB_TEMPLATE.gbc ./bin/gbc/ZGB_TEMPLATE.patched.gbc
 
     - name: Upload build artifacts
