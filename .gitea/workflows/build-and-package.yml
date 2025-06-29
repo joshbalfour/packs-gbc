@@ -52,7 +52,7 @@ jobs:
         cd logo-appender
         make
         cd ../
-        ./logo-appender/custom_logo_appender_v1.0 ./bin/gbc/ZGB_TEMPLATE.gbc ./bin/gbc/ZGB_TEMPLATE.patched.gbc
+        ./logo-appender/custom_logo_appender_v1.0 ./bin/gbc/PACKS.gbc ./bin/gbc/PACKS.patched.gbc
 
     - name: Upload build artifacts
       uses: christopherhx/gitea-upload-artifact@v4

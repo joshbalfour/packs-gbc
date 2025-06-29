@@ -11,6 +11,6 @@
     "oldLicenseeCode": "33",
     "romVersionNumber": "01",
     "nintendoLogo": "./custom-logo.png",
-    "romLocation": "./bin/gbc/ZGB_TEMPLATE.gbc",
-    "outputRomLocation": "./bin/gbc/ZGB_TEMPLATE.patched.gbc"
+    "romLocation": "./bin/gbc/PACKS.gbc",
+    "outputRomLocation": "./bin/gbc/PACKS.patched.gbc"
 }
