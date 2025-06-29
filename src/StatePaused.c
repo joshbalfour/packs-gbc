@@ -12,12 +12,12 @@ void START(void) {
 }
 
 void UPDATE(void) {
-    if (KEY_TICKED(J_START)) {
+    if (KEY_TICKED(J_A)) {
         fade_enabled = TRUE;
         SetState(DEVICE_SUPPORTS_COLOR ? StateMenu : StateSplash);
     }
 
-    if (KEY_TICKED(J_SELECT | J_A | J_B)) {
+    if (KEY_TICKED(J_SELECT | J_START | J_B)) {
         resumeGame = 1;
         SetState(StateGame);
     }
