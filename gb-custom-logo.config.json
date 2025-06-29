@@ -1,0 +1,16 @@
+{
+    "title": "PACKS",
+    "manufacturerCode": "JOSH",
+    "cgbFlag": "80",
+    "newLicenseeCode": "3030",
+    "sgbFlag": "00",
+    "cartridgeType": "19",
+    "romSize": "01",
+    "ramSize": "00",
+    "destinationCode": "00",
+    "oldLicenseeCode": "33",
+    "romVersionNumber": "01",
+    "nintendoLogo": "./custom-logo.png",
+    "romLocation": "./bin/gbc/ZGB_TEMPLATE.gbc",
+    "outputRomLocation": "./bin/gbc/ZGB_TEMPLATE.patched.gbc"
+}

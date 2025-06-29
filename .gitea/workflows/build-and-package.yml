@@ -44,6 +44,9 @@ jobs:
         GBDK_HOME: ${{ env.GBDK_HOME }}
         ZGB_PATH: ${{ env.ZGB_PATH }}
 
+    - name: Run custom logo tool
+      run: npx -y @joshbalfour/gb-custom-logo@latest
+
     - name: Upload build artifacts
       uses: christopherhx/gitea-upload-artifact@v4
       with:
