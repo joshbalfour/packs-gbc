@@ -17,7 +17,7 @@ void START(void) {
 void UPDATE(void) {
     if (!logodoneWithIt) {
         logoctr1++;
-        if (logoctr1 == 60) {
+        if (logoctr1 == 30) {
             logoctr1 = 0;
             logoctr2++;
         }
