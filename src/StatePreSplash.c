@@ -8,7 +8,7 @@ IMPORT_HICOLOR(packsinc);
 void START(void) {
 
     if (!DEVICE_SUPPORTS_COLOR) {
-        SetState(StateSplash);
+        SetState(StateLogo);
         return;
     }
 
@@ -40,7 +40,7 @@ void UPDATE(void) {
             LCD_install();
             // endble fading back
             fade_enabled = TRUE;
-            SetState(StateSplash);
+            SetState(StateLogo);
         }
     }
 }

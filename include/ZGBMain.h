@@ -4,6 +4,7 @@
 #define STATES \
 _STATE(StateGame)\
 _STATE(StateDone)\
+_STATE(StateLogo)\
 _STATE(StatePreSplash)\
 _STATE(StateSplash)\
 _STATE(StateTest)\
