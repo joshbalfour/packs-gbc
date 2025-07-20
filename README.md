@@ -1,3 +1,4 @@
+![bork!](res/backgrounds/gbc/splash.png)
 # Packs Retro Port
 Created using [CrossZGB](https://github.com/gbdk-2020/CrossZGB).
 
