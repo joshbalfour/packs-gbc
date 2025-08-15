@@ -1,7 +1,6 @@
 name: Build project
 
 on:
-# uncomment lines below to (re)build on each push
  push:
    branches:
      - main
@@ -27,8 +26,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install pillow wave
 
-    - name: Download ZGB-Linux-x64 mirrored from https://github.com/gbdk-2020/CrossZGB/actions/runs/14029475958
-      run: wget https://s3.home.fa.gl/e36-stuff/ZGB-Linux-x64.tar.gz
+    - name: Download ZGB-Linux-x64
+      run: wget https://github.com/gbdk-2020/CrossZGB/releases/download/v2025.0/ZGB-Linux-x64.tar.gz
 
     - name: Unpack ZGB-Linux-x64
       run: |
