@@ -3,9 +3,9 @@
 <img src="./screenshots/gameplay.png" width="160">
 
 # Packs Retro Port
-A port of [Packs, the pattern matching card game](https://packsgame.com) originally released in 2018 for android, iOS, and web.
-
 Available at [retro.packsgame.com](https://retro.packsgame.com/).
+
+A port of [Packs, the pattern matching card game](https://packsgame.com) originally released in 2018 for android, iOS, and web.
 
 [Created using CrossZGB](https://github.com/gbdk-2020/CrossZGB).
 
