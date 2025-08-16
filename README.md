@@ -14,6 +14,13 @@ Designed to run on Gameboy Color and Pocket.
 ## CI
 [The build workflow](./.github/workflows/build-and-package.yml) runs every push to the main branch, and uploads the rom file as an asset.
 
+## Custom Boot Logo
+The Nintendo™️ logo is replaced with a custom boot logo:
+![bork!](./custom-logo.png)
+
+This is done using [the @joshbalfour/gb-custom-logo npm module](https://www.npmjs.com/package/@joshbalfour/gb-custom-logo).
+
+
 ## Game logic
 [Game logic lives in packs.c](./src/packs.c), and [rendering logic lives in the Game State](./src/StateGame.c). Huge thanks to [sanderevers](https://github.com/sanderevers) for [their blog post expressing SET cards as binary](https://sanderevers.github.io/2019/09/11/finding-sets.html), which I borrowed from heavily.
 
